@@ -29,7 +29,11 @@ class ApiAccess(models.Model):
 
 if 'django.contrib.auth' in settings.INSTALLED_APPS:
     import uuid
-    from tastypie.compat import AUTH_USER_MODEL
+    
+    # As per: https://github.com/mpyatishev/django-tastypie/commit/59515720c94b97802cbb32904db549845f30cdae
+    # from tastypie.compat import AUTH_USER_MODEL
+    AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
+
     class ApiKey(models.Model):
         user = models.OneToOneField(AUTH_USER_MODEL, related_name='api_key')
         key = models.CharField(max_length=128, blank=True, default='', db_index=True)
@@ -52,7 +56,6 @@ if 'django.contrib.auth' in settings.INSTALLED_APPS:
 
         class Meta:
             abstract = getattr(settings, 'TASTYPIE_ABSTRACT_APIKEY', False)
-
 
     def create_api_key(sender, **kwargs):
         """
